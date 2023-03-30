@@ -22,7 +22,7 @@ static void task1(void* pvParams);
 static void task2(void* pvParams);
 static void task3(void* pvParams);
 static void task4(void* pvParams);
-//static void task5(void* pvParams);
+static void task5(void* pvParams);
 static void TimerCallBack(TimerHandle_t tmr);
 
 
@@ -110,16 +110,31 @@ static void task4(void* pvParams) {
 		}
 	}
 }
+static void task5(void* pvParams) {
+	static uint8_t value = 0;
+	while (1) {
+		xSemaphoreTake(binSem5, portMAX_DELAY);
 
+		//mxDisp7seg_SelectDigit(myDisp, 3);
+		//mxDisp7seg_SetDigit(myDisp, character[value]);
+
+		dispMem[4] = value;
+
+		value++;
+		if (value == 10) {
+			value = 0;
+		}
+	}
+}
 
 static void TimerCallBack (TimerHandle_t tmr) {
 	// xSemaphoreGive(binSem1); //prvi deo zadatka
-	static uint8_t ctrl = 4;
+	static int8_t ctrl = 4;
 	static uint8_t count = 0;
 	mxDisp7seg_SelectDigit(myDisp, ctrl);
 	mxDisp7seg_SetDigit(myDisp, character[dispMem[4-ctrl]]);
 	ctrl--;
-	if (ctrl == 0) {
+	if (ctrl == -1) {
 		ctrl = 4;
 	}
 	count++;
@@ -146,7 +161,7 @@ void III_vezba_1(void)
 	xTaskCreate(task2, NULL, configMINIMAL_STACK_SIZE, NULL, task_prioritet, NULL);
 	xTaskCreate(task3, NULL, configMINIMAL_STACK_SIZE, NULL, task_prioritet, NULL);
 	xTaskCreate(task4, NULL, configMINIMAL_STACK_SIZE, NULL, task_prioritet, NULL);
-	//xTaskCreate(task5, NULL, configMINIMAL_STACK_SIZE, NULL, task_prioritet, NULL);
+	xTaskCreate(task5, NULL, configMINIMAL_STACK_SIZE, NULL, task_prioritet, NULL);
 	//xTaskCreate(task3, NULL, configMINIMAL_STACK_SIZE, NULL, task_prioritet, NULL);
 
 	// Kreiranje softverskih tajmera 
